@@ -1,10 +1,9 @@
 let mysql = require('mysql');
-let config = require('./config');
 let userDB = mysql.createConnection({
-  host: config.host,
-  user: config.user,
-  password: config.password,
-  database: config.database
+  host: process.env.MYSQL_ROOT_HOST,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_ROOT_PASSWORD,
+  database: process.env.MYSQL_DATABASE
 });
 userDB.connect();
 

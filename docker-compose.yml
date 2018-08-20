@@ -1,0 +1,28 @@
+version: '3.7'
+
+services:
+  cite-api:
+    container_name: backend
+    build: ./
+    command: npm start
+    working_dir: /projects/cites
+    environment:
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_ROOT_HOST: mysql
+      MYSQL_DATABASE: users
+    ports:
+      - 3003:3003
+    volumes:
+      - ./:/projects/cites
+    links:
+      - mysql
+  mysql:
+    image: mysql
+    environment:
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_ROOT_HOST: localhost
+      MYSQL_DATABASE: users
+    ports:
+      - 3306:3306
