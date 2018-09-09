@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon src/index.js",
+    "start": "MYSQL_ROOT_HOST=localhost MYSQL_USER=root MYSQL_ROOT_PASSWORD=movieclip1 MYSQL_DATABASE=users nodemon bin/www",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
