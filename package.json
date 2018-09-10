@@ -17,6 +17,7 @@
     "prettier": "^1.14.0"
   },
   "dependencies": {
+    "body-parser": "^1.18.3",
     "mysql": "^2.16.0"
   }
 }

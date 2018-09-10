@@ -1,13 +1,24 @@
 const express = require("express");
+const db = require("../db");
 const router = express.Router();
-const db = require('../db');
 
-router.get('/cites', function (req, res) {
-  db.query(`SELECT text AS "cite", name AS "author" FROM cites JOIN author ON cites.author_id = author.id`, function (err, rows) {
-    if (err) throw err;
-    console.log('rows', rows);
-    res.json(rows);
-  });
+router.get("/", (req, res) => {
+  db.query(
+    `SELECT text AS "cite", name AS "author" FROM cites JOIN author ON cites.author_id = author.id`,
+    (err, rows) => {
+      if (err) throw err;
+      res.json(rows);
+    }
+  );
+});
+
+router.post("/create", function(req, res) {
+  // db.query(`INSERT INTO cites (author_id, text) VALUES (${req.body.author}, "${req.body.cite}")`, function (err) {
+  //   if (err) throw err;
+  //   res.json({status: 'ok', message: 'Cite is successfully added', req: req.body});
+  // });
+  console.log("HEELLOOO WORLD");
+  res.send("Good");
 });
 
 module.exports = router;
