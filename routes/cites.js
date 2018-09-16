@@ -5,7 +5,7 @@ const db = require("../db");
 const router = express.Router();
 
 const getCites = (res) => {
-    db.query(`SELECT text AS "cite", name AS "author" FROM cites JOIN author ON cites.author_id = author.id`,
+    db.query(`SELECT text AS "cite", name AS "author" FROM cites JOIN author ON cites.author_id = author.id ORDER BY cites.id DESC`,
       (err, rows) => {
           if (err) throw err;
           res.json(rows);
