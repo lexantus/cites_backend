@@ -64,31 +64,35 @@ const signin = (req, res) => {
 };
 
 const checkUserNotExist = login => {
-  db.query(`SELECT * FROM users WHERE name="${login}"`, (err, rows) => {
-    if (err) return Promise.reject(err);
-    if (!rows.length) return Promise.resolve();
-    return Promise.reject("User already exist");
+  return new Promise((resolve, reject) => {
+    db.query(`SELECT * FROM users WHERE name="${login}"`, (err, rows) => {
+      if (err) return reject(err);
+      if (!rows.length) resolve();
+      return reject(new Error("User already exist"));
+    });
   });
 };
 
 router.post("/register", (req, res) => {
-  const { login, password } = req;
-  if (!login || !password)
+  const { login, password } = req.body;
+  console.log('LOGIN ', login, ' PASSWORD ', password);
+  if (!login || !password) {
     res.status(400).json("Need login and password to register");
+    return;
+  }
 
   checkUserNotExist(login)
     .then(() => {
-      db.request(
-        `INSERT INTO users (name, password) VALUES ("${login}", UNHEX("${sha1(
-          password
-        )}"))`,
-        (err, rows) => {
+      db.query(`INSERT INTO users (name, password) VALUES ("${login}", UNHEX("${sha1(password)}"))`,
+        (err, row) => {
           if (err) throw err;
-          res.json({ id: rows[0].id, name: rows[0].name });
+          res.json({ id: row.insertId });
         }
       );
     })
-    .catch(err => res.status(400).json(err));
+    .catch(err => {
+      res.status(400).send(err.message);
+    });
 });
 
 router.post("/signin", (req, res) => {
