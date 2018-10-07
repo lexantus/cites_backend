@@ -10,9 +10,9 @@ const router = express.Router();
 const handleAuthToken = (token, res) => {
   return redisClient.get(token, (err, reply) => {
     if (err || !reply) {
-      return res.status(400).json("Unauthorithed");
+      return res.status(400).json({ success: true, message: "Unauthorithed" });
     }
-    return res.json({ id: reply });
+    return res.json({ success: true, id: reply });
   });
 };
 
@@ -23,7 +23,7 @@ const createSession = user => {
   });
   return redisClient
     .set(token, id)
-    .then(() => ({ success: "true", id, token }))
+    .then(() => ({ success: true, id, token }))
     .catch(err => {
       throw err;
     });
@@ -31,7 +31,10 @@ const createSession = user => {
 
 const signin = (req, res) => {
   const { login, password } = req;
-  if (!login || !password) res.status(400).json("Need login and password");
+  if (!login || !password)
+    res
+      .status(400)
+      .json({ success: false, message: "Need login and password" });
 
   try {
     db.query(
@@ -59,7 +62,7 @@ const signin = (req, res) => {
     );
   } catch (e) {
     console.log("[LOGIN ERROR]", e);
-    res.status(400).json(e);
+    res.status(400).json({ success: false, message: e.message });
   }
 };
 
@@ -74,24 +77,30 @@ const checkUserNotExist = login => {
 };
 
 router.post("/register", (req, res) => {
+  console.log("body", req.body);
   const { login, password } = req.body;
-  console.log('LOGIN ', login, ' PASSWORD ', password);
+  console.log("LOGIN ", login, " PASSWORD ", password);
   if (!login || !password) {
-    res.status(400).json("Need login and password to register");
+    res
+      .status(400)
+      .json({ success: false, message: "Need login and password to register" });
     return;
   }
 
   checkUserNotExist(login)
     .then(() => {
-      db.query(`INSERT INTO users (name, password) VALUES ("${login}", UNHEX("${sha1(password)}"))`,
+      db.query(
+        `INSERT INTO users (name, password) VALUES ("${login}", UNHEX("${sha1(
+          password
+        )}"))`,
         (err, row) => {
           if (err) throw err;
-          res.json({ id: row.insertId });
+          res.json({ success: true, id: row.insertId });
         }
       );
     })
     .catch(err => {
-      res.status(400).send(err.message);
+      res.status(400).send({ success: false, message: err.message });
     });
 });
 
