@@ -21,16 +21,16 @@ const createSession = user => {
   const token = jwt.sign({ name }, process.env.JWT_SECRET, {
     expiresIn: "2 days"
   });
-  return redisClient
-    .set(token, id)
-    .then(() => ({ success: true, id, token }))
-    .catch(err => {
-      throw err;
+  return new Promise((resolve, reject) => {
+    redisClient.set(token, id, err => {
+      if (err) reject(err);
+      return resolve({ success: true, id, token });
     });
+  });
 };
 
 const signin = (req, res) => {
-  const { login, password } = req;
+  const { login, password } = req.body;
   if (!login || !password)
     res
       .status(400)
@@ -41,7 +41,7 @@ const signin = (req, res) => {
       `SELECT id, name, password FROM users WHERE name="${login}"`,
       (err, rows) => {
         if (err) throw err;
-        const isValid = bcrypt.compareSync(password, rows[0].password);
+        const isValid = sha1(password) === rows[0].password.toString("hex");
         if (isValid) {
           const { id, name } = rows[0];
           createSession({ id, name })
